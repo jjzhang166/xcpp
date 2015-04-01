@@ -1,5 +1,5 @@
 # Welcome to the XCPP wiki!
-<img src="resources/1.png">
+<img src="http://i2.tietuku.com/85be8eee38b7eb67.png">
 
 [XCPP开源项目](http://git.oschina.net/ccb/XCPP)
 
