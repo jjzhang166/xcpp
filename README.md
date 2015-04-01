@@ -1,59 +1,44 @@
 # Welcome to the XCPP wiki!
 <img src="resources/1.png">
 
-[XCPP¿ªÔ´ÏîÄ¿](http://git.oschina.net/ccb/XCPP)
+[XCPPå¼€æºé¡¹ç›®](http://git.oschina.net/ccb/XCPP)
 
-## ¸ÅÊö
-	XCPP ÊÇÒ»¸ö¾«¼òµÄ¡¢¸ßÐ§µÄ¿çÆ½Ì¨C++¿ª·¢¿â.
+## æ¦‚è¿°
+	XCPP æ˜¯ä¸€ä¸ªç²¾ç®€çš„ã€é«˜æ•ˆçš„è·¨å¹³å°C++å¼€å‘åº“.
 	
-	X´ú±ícross£¬¿çÆ½Ì¨ÌØÐÔ
+	Xä»£è¡¨crossï¼Œè·¨å¹³å°ç‰¹æ€§;	CPPå°±æ˜¯C++(cplusplus)
 	
-	CPP¾ÍÊÇC++(cplusplus)
+	XCPPçš„ç›®æ ‡æ˜¯ç”¨æœ´å®žçš„C++ç¼–ç¨‹è¯­è¨€å®žçŽ°ä¸€ä¸ªè·¨å¹³å°çš„C++å¼€å‘åº“ã€‚
+
+## ç”¨å¤„
+	1. ç¼–å†™è·¨å¹³å°ç¨‹åºï¼Œæœ¬APIæ”¯æŒwindows/Linux;
+	2. ç§»æ¤è·¨å¹³å°ç¨‹åºï¼Œå°†å·²æœ‰ç¨‹åºå¹³å°ç›¸å…³ä»£ç ç”¨æœ¬åº“çš„APIæ›¿æ¢ï¼Œä½¿ä¹‹å…·æœ‰è·¨å¹³å°ç‰¹æ€§;
+
+
+## ç†å¿µå’ŒåŽŸåˆ™ï¼š
+	1. ç®€åŒ–APIæ“ä½œ;
+	2. é£Žæ ¼å°½é‡æŽ¥è¿‘äºŽæ“ä½œç³»ç»ŸåŽŸè¯­ï¼ŒåŽ»é™¤å¹³å°å„è‡ªç‹¬æœ‰çš„ç‰¹æ€§;
+	3. å°½é‡ä½¿ç”¨NATIVE APIä»¥æé«˜è¿è¡Œæ•ˆçŽ‡;
+	4. å°½é‡ä¸å¼•ç”¨ç¬¬ä¸‰æ–¹åº“ä»¥é™ä½Žè€¦åˆæ€§;
+	5. ä½¿ç”¨ç®€ä»‹å®žç”¨çš„ç¼–ç¨‹é£Žæ ¼ä»¥æé«˜å¯è¯»æ€§;
 	
-	XCPPµÄÄ¿±êÊÇÓÃÆÓÊµµÄC++±à³ÌÓïÑÔÊµÏÖÒ»¸ö¿çÆ½Ì¨µÄC++¿ª·¢¿â¡£
-
-## ÓÃ´¦
-	1. ±àÐ´¿çÆ½Ì¨³ÌÐò£¬±¾APIÖ§³Öwindows/Linux;
-	2. ÒÆÖ²¿çÆ½Ì¨³ÌÐò£¬½«ÒÑÓÐ³ÌÐòÆ½Ì¨Ïà¹Ø´úÂëÓÃ±¾¿âµÄAPIÌæ»»£¬Ê¹Ö®¾ßÓÐ¿çÆ½Ì¨ÌØÐÔ;
+	*  ç›®å‰çš„ä¸€äº›è®¾è®¡æ€æƒ³æœ‰äº›æ˜¯å­¦ä¹ [chromium](http://dev.chromium.org/)ã€[Qt](http://qt-project.org)ç­‰çŸ¥åå¼€æºé¡¹ç›®
 
 
-## ÀíÄîºÍÔ­Ôò£º
-	1. ¼ò»¯API²Ù×÷;
-	2. ·ç¸ñ¾¡Á¿½Ó½üÓÚ²Ù×÷ÏµÍ³Ô­Óï£¬È¥³ýÆ½Ì¨¸÷×Ô¶ÀÓÐµÄÌØÐÔ;
-	3. ¾¡Á¿Ê¹ÓÃNATIVE APIÒÔÌá¸ßÔËÐÐÐ§ÂÊ;
-	4. ¾¡Á¿²»ÒýÓÃµÚÈý·½¿âÒÔ½µµÍñîºÏÐÔ;
-	5. Ê¹ÓÃ¼ò½éÊµÓÃµÄ±à³Ì·ç¸ñÒÔÌá¸ß¿É¶ÁÐÔ;
-	
-	*  Ä¿Ç°µÄÒ»Ð©Éè¼ÆË¼ÏëÓÐÐ©ÊÇÑ§Ï°[chromium](http://dev.chromium.org/)¡¢[Qt](http://qt-project.org)µÈÖªÃû¿ªÔ´ÏîÄ¿
-
-
-## ¹¦ÄÜÌØÐÔ£º
+## åŠŸèƒ½ç‰¹æ€§ï¼š
 	1. Support Windows and Linux
 	2. Atomic operation
 	3. UDP/TCP(client and server) Socket
 	4. Process
 	5. Thread
-	6. Sempehpore binary¡¢mutex¡¢counter
-	7. algrithom: CRC32¡¢MD5
-	8. misc utilities
-	9. hash string
-		
-	×¢£ºCRC32¡¢MD5¡¢hash  stringÎªÖ±½ÓÒýÓÃµÚÈý·½Ô´Âë
+	6. Sempehpore binaryã€mutexã€counter
+	7. misc utilities
+	8. hash string
+
+## å…¶ä»–
+	å½“å‰ç‰ˆæœ¬åœ¨XCPPå·¥ç¨‹ï¼ˆV0.7.2ï¼‰ forkè€Œæ¥ï¼Œç›¸å½“äºŽXCPPçš„Liteç‰ˆæœ¬ã€‚
+	ç‰ˆæœ¬å·ç›´æŽ¥ä»Ž0.7.2çš„åŸºç¡€ä¸Šå»¶ç»­äº†ï¼Œåˆšåˆšä¿®æ”¹äº†éƒ¨åˆ†ä»£ç ã€‚ã€‚linuxå¯èƒ½æš‚æ—¶æœ‰å°‘è®¸ç¼–è¯‘ä¸è¿‡.
 
 
-Ä¿Ç°»¹´¦ÓÚ¿ª·¢½×¶Î£¬ËùÔÝÊ±»¹ÊÇ±ÕÔ´µÄ¡£
-¼Æ»®µÈ·¢Õ¹µ½1.0Alpha°æ±¾Ö®ºó£¬²¢¾­¹ýÏêÏ¸²âÊÔÖ®ºó¿ªÊ¼×÷Îª¿ªÔ´Èí¼þ½øÐÐÔË×÷¡£
 
 
-´úÂëÄ¿Ç°ÍÐ¹ÜÔÚ http://git.oschina.net µÄË½ÓÐ²Ö¿â¡£
-
-## ¼ÓÈëÎÒÃÇ£º
-1. ÓÃÓÊÏä[´´½¨oschinaÕËºÅ](https://www.oschina.net/home/reg)
-2. ÓÃoschinaÕËºÅ£¨ºÍ×¢²áÓÊÏä£©Á¬½Ó[git@oschina](http://git.oschina.net/)
-3. ¸æÖªÎÒ[ÓÊÏä](mailto:chennqqi@qq.com)£¬ÎÒ½«ÄúÓÊÏä¼ÓÈëÏîÄ¿×é£¬Äú¿ÉÒÔ·ÃÎÊ´úÂë²Ö¿âÁË£¡
-
-## [±à³Ì±Ø¶Á](http://git.oschina.net/ccb/XCPP/wikis/ProgrammingTips)
-## [ÈÎÎñÁÐ±í](http://git.oschina.net/ccb/XCPP/wikis/TodoList)
-## [³£¼ûÎÊÌâ](http://git.oschina.net/ccb/XCPP/wikis/Faq)
-## [×ÊÁÏÎÄµµ](http://git.oschina.net/ccb/XCPP/wikis/documents)
-## [°æ±¾¼Æ»®](http://git.oschina.net/ccb/XCPP/wikis/Version-Plan)
