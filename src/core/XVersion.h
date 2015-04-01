@@ -1,0 +1,14 @@
+#ifndef __XCPPVERSION_H__
+#define __XCPPVERSION_H__
+
+#define X_VERSION_MAJOR			0
+#define X_VERSION_MINOR			8
+#define X_VERSION_REVISION		0
+
+#define X_VERSION_MAKE(_ma,_mi,_re)		((_ma)<<16|(_mi)<<8|(_re))
+#define X_VERSION_VALUE			X_VERSION_MAKE(X_VERSION_MAJOR,X_VERSION_MINOR,X_VERSION_REVISION)
+
+#define X_VERSION_BASE			"0.8.0Dev"	
+#define X_VERSION_STR			X_VERSION_BASE
+
+#endif /*__XCPPVERSION_H__*/
