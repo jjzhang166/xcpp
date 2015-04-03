@@ -160,7 +160,7 @@ int CXSettings::EnumValue(ENUM_SETTING_FUNC pFunc)
 BOOL CXSettings::Save(const char* pszSettingFile)
 {
 	_ASSERT(pszSettingFile);
-	std::fstream file_out(pszSettingFile, std::ios_base::out);
+	std::fstream file_out(pszSettingFile, std::ios_base::out|std::ios::trunc);
 	if (file_out.is_open())
 	{
 		XSETTING_MAP::const_iterator mapciter = m_mapVal.begin();
