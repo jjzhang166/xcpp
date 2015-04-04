@@ -1,0 +1,1 @@
+1. CXSetting save config into files which contains section will disorder.(2015/04/05 CHENQ)
