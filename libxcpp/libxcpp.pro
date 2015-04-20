@@ -26,60 +26,47 @@ CONFIG(debug,debug|release) {
 
 QT -= gui
 QT -= core
-DEPENDPATH += . ../src
-INCLUDEPATH += . ../src
+DEPENDPATH += . ../src/core
+INCLUDEPATH += . ../src/core
 
 unix {
 }
 
 # Input
-HEADERS += ../src/XApplication.h \
-           ../src/ethCrc32.h \
-           ../src/MD5c.h \
+HEADERS += ../src/core/XApplication.h \
            stdafx.h \
-           ../src/StringHash.h \
-           ../src/XAfx.h \
-		   ../src/XVersion.h \
-           ../src/XEndian.h \
-           ../src/XFileHelper.h \
-           ../src/XLinux_P.h \
-           ../src/XLog.h \
-           ../src/XLogDefines.h \
-           ../src/XMacro.h \
-           ../src/XPipe.h \
-           ../src/XPosix_P.h \
-           ../src/XProcess.h \
-           ../src/XSemaphore.h \
-           ../src/XSettings.h \
-           ../src/XSocket.h \
-           ../src/XTcpSocket.h \
-           ../src/XThread.h \
-           ../src/XUdpSocket.h \
-           ../src/XUtils.h \
-		   ../src/XEString.h \
-		   ../src/XFile.h \
-		   ../src/XSTLMacro.h \
-		   ../src/XSharedMemory.h
+           ../src/core/XAfx.h \
+				   ../src/core/XVersion.h \
+           ../src/core/XEndian.h \
+           ../src/core/XLog.h \
+           ../src/core/XMacro.h \
+           ../src/core/XProcess.h \
+           ../src/core/XSemaphore.h \
+           ../src/core/XSettings.h \
+           ../src/core/XSocket.h \
+           ../src/core/XTcpSocket.h \
+           ../src/core/XThread.h \
+           ../src/core/XUdpSocket.h \
+           ../src/core/XUtils.h \
+		   ../src/core/XEString.h \
+		   ../src/core/XFile.h \
+		   ../src/core/XSTLMacro.h \
+		   ../src/core/XSharedMemory.h
 		   
 		   
-SOURCES += ../src/XApplication.cpp \
-			../src/ethCrc32.cpp \
-			../src/MD5c.cpp \
-			../src/stdafx.cpp \
-			../src/StringHash.cpp \
-			../src/XLog.cpp \
-			../src/XPipe.cpp \
-			../src/XProcess.cpp \
-			../src/XSemaphore.cpp \
-			../src/XSettings.cpp \
-			../src/XSocket.cpp \
-			../src/XTcpSocket.cpp \
-           ../src/XThread.cpp \
-           ../src/XUdpSocket.cpp \
-           ../src/XUtils.cpp \
-		   ../src/XEString.cpp \
-   		   ../src/XFile.cpp \
-  		   ../src/XSharedMemory.cpp
+SOURCES += ../src/core/XApplication.cpp \
+			../src/core/XLog.cpp \
+			../src/core/XProcess.cpp \
+			../src/core/XSemaphore.cpp \
+			../src/core/XSettings.cpp \
+			../src/core/XSocket.cpp \
+			../src/core/XTcpSocket.cpp \
+      ../src/core/XThread.cpp \
+      ../src/core/XUdpSocket.cpp \
+      ../src/core/XUtils.cpp \
+			../src/core/XEString.cpp \
+   		../src/core/XFile.cpp \
+  		../src/core/XSharedMemory.cpp
 
 
 VERSION = 0.6.0

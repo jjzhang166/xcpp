@@ -449,6 +449,13 @@ BOOL CXProcess::IsProcessExit(XProcessHandle pHandle)
 #endif
 }
 
+XSTLString CXProcess::GetWorkingDir()
+{
+	TCHAR szWorkDir[_MAX_PATH] = { 0 };
+	_tgetcwd(szWorkDir, sizeof(szWorkDir));
+	return szWorkDir;
+}
+
 #if 0
 BOOL CXProcess::IsExit()
 {

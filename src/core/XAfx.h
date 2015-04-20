@@ -67,6 +67,7 @@ NOTE:
 #include <WinBase.h>
 #include <Ws2tcpip.h>
 #include <crtdbg.h>
+#include <direct.h>
 #include <stdint.h>
 #include <io.h>
 typedef void* caddr_t;
