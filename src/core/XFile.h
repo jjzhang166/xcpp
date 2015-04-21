@@ -1,7 +1,7 @@
 #ifndef __XFILE_H__
 #define __XFILE_H__
 
-#include <string>
+#include "XSTLMacro.h"
 
 class CXFilePath
 {
@@ -9,6 +9,8 @@ public:
 	static TCHAR* Unix2Dos(TCHAR* pszPath);
 	static TCHAR* Dos2Unix(TCHAR* pszPath);
 	static TCHAR* GetFileDir(TCHAR* pszPath);
+	static XSTLString Unix2Dos(const XSTLString& unixPath);
+	static XSTLString Dos2Unix(const XSTLString& dosPath);
 	static BOOL IsDirExist(const TCHAR* pszDir);
 	static BOOL IsPathDir(const TCHAR* pszPath);
 	static BOOL IsPathFile(const TCHAR* pszPath);

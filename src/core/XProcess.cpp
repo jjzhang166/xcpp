@@ -36,6 +36,7 @@ note:
 #include "XProcess.h"
 #include "XLog.h"
 #include "XUtils.h"
+#include "XFile.h"
 
 #define RAW_LOG XLOG_PRINT
 
@@ -261,6 +262,78 @@ XProcessId CXProcess::GetCurrentProcessId()
 #else
 	return ::getpid();
 #endif
+}
+
+int CXProcess::StartDetached(const XSTLString& cmd)
+{
+	if (cmd.empty())
+	{
+		return -1;
+	}
+	XSTLString workDir = CXProcess::GetWorkingDir();
+#ifdef OS_WIN
+	TCHAR szCmd[_MAX_PATH] = {0};
+	XStrCpyN(szCmd, cmd.c_str(), sizeof(szCmd));
+	STARTUPINFO si = {sizeof(si)} ;
+	PROCESS_INFORMATION pi = {0};
+	DWORD dCreateFlag = CREATE_NEW_CONSOLE;
+#ifdef UNICODE
+	dCreateFlag |= CREATE_UNICODE_ENVIRONMENT;
+#endif
+
+	if ( !CreateProcess(NULL, szCmd, NULL, NULL, FALSE, 
+		dCreateFlag, NULL, workDir.c_str(), &si, &pi))
+	{
+		return -2;
+	}
+
+	//这里要关闭，否则就是泄露windows句柄资源
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	return 0;
+#else
+#endif
+}
+
+static XSTLString buildCmdLineString(const XSTLString& cmd, const XSTLStringList& paramList)
+{
+	//参数中如果包含' ','\"','\''(Linux),需要特殊处理
+	//假设cmd 
+	_ASSERT(!cmd.empty());
+	XSTLString cmdLine;
+#ifdef OS_WIN
+	XSTLString cmdarg = CXFilePath::Dos2Unix(cmd);
+	size_t posSpace = cmdarg.find(_T(' '));
+	
+	cmdLine = cmd;
+	if (posSpace!=XSTLString::npos && cmd[0] != _T('\"'))
+	{
+		cmdLine = _T('\"') + cmdarg;
+		cmdLine += _T('\"');
+	}
+	//seperate arguments with space
+	cmdLine += _T(' ');
+
+	for (XSTLStringList::const_iterator iter=paramList.begin();
+		iter != paramList.end(); ++iter)
+	{
+		//TODO::
+
+
+	}
+#else
+
+
+#endif
+	return cmdLine;
+}
+
+int CXProcess::StartDetached(const XSTLString& cmd, const XSTLStringList& paramList)
+{
+	XSTLString cmdLine = buildCmdLineString(cmd, paramList);
+
+	return StartDetached(cmdLine);
 }
 
 void CXProcess::Init()

@@ -28,6 +28,34 @@ TCHAR* CXFilePath::Unix2Dos(TCHAR* pszPath)
 	return pszPath;
 }
 
+XSTLString CXFilePath::Unix2Dos(const XSTLString& unixPath)
+{
+	char* pszNewString = _strdup(unixPath.c_str());
+	_ASSERT(pszNewString);
+	if (NULL == pszNewString)
+	{
+		return _T("");
+	}
+	CXFilePath::Unix2Dos(pszNewString);
+	XSTLString dosString(pszNewString);
+	free(pszNewString);
+	return dosString;
+}
+
+XSTLString CXFilePath::Dos2Unix(const XSTLString& dosPath)
+{
+	char* pszNewString = _strdup(dosPath.c_str());
+	_ASSERT(pszNewString);
+	if (NULL == pszNewString)
+	{
+		return _T("");
+	}
+	CXFilePath::Dos2Unix(pszNewString);
+	XSTLString dosString(pszNewString);
+	free(pszNewString);
+	return dosString;
+}
+
 BOOL CXFilePath::IsFilePathExist(const TCHAR* pszPathFile)
 {
 	 _ASSERT(pszPathFile);

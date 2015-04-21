@@ -91,15 +91,6 @@ public:
 #ifdef OS_WIN
 	XProcessId GetProcessIdByHandle(HANDLE Process);
 #endif
-
-#if 0
-	UINT64 GetRunTimeNs() const;
-	BOOL TerminateProcess(int exit_code);
-	BOOL IsExit();
-	BOOL Close();
-	//	XProcessId GetProcessId() const;
-	//	int GetExitCode() const;
-#endif
 	
 private:
 	XProcessHandle m_pHandle;

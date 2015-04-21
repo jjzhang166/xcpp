@@ -69,4 +69,4 @@ SOURCES += ../src/core/XApplication.cpp \
   		../src/core/XSharedMemory.cpp
 
 
-VERSION = 0.6.0
+VERSION = 0.8.0
