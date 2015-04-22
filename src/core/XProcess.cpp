@@ -251,6 +251,8 @@ static const char kFDDir[] = "/dev/fd";
 //%UserPrefix% 局部 返回当前用户的配置文件的位置。
 //%WINDIR% 系统 返回操作系统目录的位置。
 
+static XSTLString buildCmdLineString(const XSTLString& cmd, const XSTLStringList& paramList);
+
 CXProcess::~CXProcess()
 {
 }
@@ -293,7 +295,62 @@ int CXProcess::StartDetached(const XSTLString& cmd)
 
 	return 0;
 #else
+	int pid = fork();
+	if (pid == 0)
+	{
+		struct sigaction noaction = {0};
+		noaction.sa_handler = SIG_IGN;
+		::sigaction(SIGPIPE, &noaction, 0);
+
+/*
+		创建新的会话组
+	默认情况下parent进程作为会话的领头进程，
+	如果exit结束执行的话，那么子进程会成为孤儿进程，
+	并被init收养
+		
+	如果创建新的会话组后，parent退出，子进程用友自己的会话组	
+*/
+		::setsid();
+
+	}
+	else
+	{
+
+	}
+
 #endif
+}
+
+int CXProcess::Execute(const XSTLString& cmd, XSTLString* pReturn)
+{
+	FILE* processFp = _tpopen(cmd.c_str(), "r");
+	if (processFp == NULL)
+	{
+		return -1;
+	}
+	if (NULL != pReturn)
+	{
+		TCHAR szBuffer[1024] = {0};
+		do 
+		{
+			ssize_t rLen = fread(szBuffer, 1, sizeof(szBuffer), processFp);
+			if (rLen > 0)
+			{
+				*pReturn += XSTLString(szBuffer, rLen);
+			}
+			if (rLen < sizeof(szBuffer))
+			{
+				break;
+			}
+		} while (TRUE);
+	}
+	return _pclose(processFp);
+}
+
+int CXProcess::Execute(const XSTLString& cmd, const XSTLStringList& paramList, XSTLString* pReturn)
+{
+	XSTLString cmdLine = buildCmdLineString(cmd, paramList);
+	return CXProcess::Execute(cmdLine, pReturn);
 }
 
 static XSTLString buildCmdLineString(const XSTLString& cmd, const XSTLStringList& paramList)
@@ -307,24 +364,52 @@ static XSTLString buildCmdLineString(const XSTLString& cmd, const XSTLStringList
 	size_t posSpace = cmdarg.find(_T(' '));
 	
 	cmdLine = cmd;
+	//如果有空格加上 ""
 	if (posSpace!=XSTLString::npos && cmd[0] != _T('\"'))
 	{
 		cmdLine = _T('\"') + cmdarg;
 		cmdLine += _T('\"');
 	}
-	//seperate arguments with space
-	cmdLine += _T(' ');
 
 	for (XSTLStringList::const_iterator iter=paramList.begin();
 		iter != paramList.end(); ++iter)
 	{
-		//TODO::
+		//seperate arguments with space
+		cmdLine += _T(' ');
 
-
+		size_t pos = iter->find(_T(' '));
+		if (pos != XSTLString::npos)
+		{
+			cmdLine += _T('\"');
+			cmdLine += *iter;
+			cmdLine += _T('\"');
+		}
+		else
+		{
+			cmdLine += *iter;
+		}
 	}
 #else
+	cmdLine = cmd;
 
+	for (XSTLStringList::const_iterator iter=paramList.begin();
+		iter != paramList.end(); ++iter)
+	{
+		//seperate arguments with space
+		cmdLine += _T(' ');
 
+		size_t pos = iter->find(_T(' '));
+		if (pos != XSTLString::npos)
+		{
+			cmdLine += _T('\'');
+			cmdLine += *iter;
+			cmdLine += _T('\'');
+		}
+		else
+		{
+			cmdLine += *iter;
+		}
+	}
 #endif
 	return cmdLine;
 }
@@ -528,25 +613,3 @@ XSTLString CXProcess::GetWorkingDir()
 	_tgetcwd(szWorkDir, sizeof(szWorkDir));
 	return szWorkDir;
 }
-
-#if 0
-BOOL CXProcess::IsExit()
-{
-	return CXProcess::IsProcessExit(m_pHandle);
-}
-
-BOOL CXProcess::Close()
-{
-	BOOL bRet = FALSE;
-#ifdef OS_WIN
-	bRet = ::CloseHandle(m_pHandle);
-	m_pHandle = INVALID_HANDLE_VALUE;
-#else
-	close(m_pid);
-	m_pid = 0;
-	m_pHandle = 0;
-	bRet = TRUE;
-#endif
-	return bRet;
-}
-#endif
