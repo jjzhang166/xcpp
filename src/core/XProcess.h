@@ -53,7 +53,10 @@ public:
 	static int Execute(const XSTLString& cmd, const XSTLStringList& paramList, XSTLString* pReturn=NULL);
 
 	/* @brief 运行一个程序
-		@detail 函数启动子进程后立即返回，主进程退出后子进程继续执行
+		@detail 函数启动子进程后立即返回，主进程退出后子进程继续执行,在Unix系统中，这样的进程称之为守护进程\n
+		@link http://zh.wikipedia.org/wiki/%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B
+		@link http://www.linuxprofilm.com/articles/linux-daemon-howto.html
+
 	@param [in] cmd,执行程序名称（或者全路径）,
 	@param [in] paramList,参数列表
 	@param [out] pRunText, 返回

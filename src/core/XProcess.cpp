@@ -295,14 +295,39 @@ int CXProcess::StartDetached(const XSTLString& cmd)
 
 	return 0;
 #else
-	int pid = fork();
-	if (pid == 0)
-	{
-		struct sigaction noaction = {0};
-		noaction.sa_handler = SIG_IGN;
-		::sigaction(SIGPIPE, &noaction, 0);
+	XSTLStringList list;
+	return CXProcess::StartDetached(cmd, list);
+#endif
+}
+	
+int CXProcess::StartDetached(const XSTLString& cmd, const XSTLStringList& paramList)
+{
+#ifdef OS_WIN
+	XSTLString cmdLine = buildCmdLineString(cmd, paramList);
+	return CXProcess::StartDetached(cmdLine);
+#else
+	//http://www.linuxprofilm.com/articles/linux-daemon-howto.html
 
-/*
+	//1. fork()
+	pid_t pid = fork();
+	if (pid < 0)
+	{
+		return -1;
+	}
+	else if (pid > 0)
+	{
+		//父进程
+		wait(pid);
+		return 0;
+	}
+
+	//2. umask(0)  /* Change the file mode mask */
+	umask(0);
+	
+	//3.Opening Logs For Writing
+
+	//4. 
+	/*
 		创建新的会话组
 	默认情况下parent进程作为会话的领头进程，
 	如果exit结束执行的话，那么子进程会成为孤儿进程，
@@ -310,14 +335,34 @@ int CXProcess::StartDetached(const XSTLString& cmd)
 		
 	如果创建新的会话组后，parent退出，子进程用友自己的会话组	
 */
-		::setsid();
+	setid();
 
-	}
-	else
+	//5. Changing The Working Directory
+	_chdir("/");
+
+	//6.可以第二次fork
+	/*
+	第二次fork之后，孙子进程成为孤儿进程，被init收养，退出时自动被清理
+	*/
+	pid_t npid = fork();
+	if (npid == 0)
 	{
+		close(STDOUT_FILENO);
+		close(STDIN_FILENO);
+		close(STDERR_FILENO);
 
+		size_t paramCount = paramList.size();
+		char** ppArgv = (char**)calloc(sizeof(char*) * paramCount + 2);
+		ppArgv[0] = _strdup(cmd.c_str());
+		ppArgv[paramCount-1] = NULL;
+		UINT nIdx = 1;
+		for (const XSTLStringList::const_iterator iter=paramList.begin();
+			iter!=paramList.end(); ++iter)
+		{
+			ppArgv[nIdx++] = _strdup(iter->c_str());
+		}
+		execvp(ppArgv[0], ppArgv);
 	}
-
 #endif
 }
 
@@ -412,13 +457,6 @@ static XSTLString buildCmdLineString(const XSTLString& cmd, const XSTLStringList
 	}
 #endif
 	return cmdLine;
-}
-
-int CXProcess::StartDetached(const XSTLString& cmd, const XSTLStringList& paramList)
-{
-	XSTLString cmdLine = buildCmdLineString(cmd, paramList);
-
-	return StartDetached(cmdLine);
 }
 
 void CXProcess::Init()
