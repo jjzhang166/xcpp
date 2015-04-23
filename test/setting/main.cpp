@@ -1,8 +1,7 @@
 #include "stdafx.h"
-#include <XSettings.h>
+#include <XSettings>
 
-int main(int argc, char* argv[])
+int _tmain(int argc, char* argv[])
 {
-
-		  		
+	return 0;  		
 }
