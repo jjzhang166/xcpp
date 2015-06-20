@@ -36,6 +36,7 @@ note:
 #include "XProcess.h"
 #include "XLog.h"
 #include "XUtils.h"
+#include "XFile.h"
 
 #define RAW_LOG XLOG_PRINT
 
@@ -250,6 +251,8 @@ static const char kFDDir[] = "/dev/fd";
 //%UserPrefix% 局部 返回当前用户的配置文件的位置。
 //%WINDIR% 系统 返回操作系统目录的位置。
 
+static XSTLString buildCmdLineString(const XSTLString& cmd, const XSTLStringList& paramList);
+
 CXProcess::~CXProcess()
 {
 }
@@ -261,6 +264,199 @@ XProcessId CXProcess::GetCurrentProcessId()
 #else
 	return ::getpid();
 #endif
+}
+
+int CXProcess::StartDetached(const XSTLString& cmd)
+{
+	if (cmd.empty())
+	{
+		return -1;
+	}
+	XSTLString workDir = CXProcess::GetWorkingDir();
+#ifdef OS_WIN
+	TCHAR szCmd[_MAX_PATH] = {0};
+	XStrCpyN(szCmd, cmd.c_str(), sizeof(szCmd));
+	STARTUPINFO si = {sizeof(si)} ;
+	PROCESS_INFORMATION pi = {0};
+	DWORD dCreateFlag = CREATE_NEW_CONSOLE;
+#ifdef UNICODE
+	dCreateFlag |= CREATE_UNICODE_ENVIRONMENT;
+#endif
+
+	if ( !CreateProcess(NULL, szCmd, NULL, NULL, FALSE, 
+		dCreateFlag, NULL, workDir.c_str(), &si, &pi))
+	{
+		return -2;
+	}
+
+	//这里要关闭，否则就是泄露windows句柄资源
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	return 0;
+#else
+	XSTLStringList list;
+	return CXProcess::StartDetached(cmd, list);
+#endif
+}
+	
+int CXProcess::StartDetached(const XSTLString& cmd, const XSTLStringList& paramList)
+{
+#ifdef OS_WIN
+	XSTLString cmdLine = buildCmdLineString(cmd, paramList);
+	return CXProcess::StartDetached(cmdLine);
+#else
+	//http://www.linuxprofilm.com/articles/linux-daemon-howto.html
+
+	//1. fork()
+	pid_t pid = fork();
+	if (pid < 0)
+	{
+		return -1;
+	}
+	else if (pid > 0)
+	{
+		//父进程
+		wait(pid);
+		return 0;
+	}
+
+	//2. umask(0)  /* Change the file mode mask */
+	umask(0);
+	
+	//3.Opening Logs For Writing
+
+	//4. 
+	/*
+		创建新的会话组
+	默认情况下parent进程作为会话的领头进程，
+	如果exit结束执行的话，那么子进程会成为孤儿进程，
+	并被init收养
+		
+	如果创建新的会话组后，parent退出，子进程用友自己的会话组	
+*/
+	setid();
+
+	//5. Changing The Working Directory
+	_chdir("/");
+
+	//6.可以第二次fork
+	/*
+	第二次fork之后，孙子进程成为孤儿进程，被init收养，退出时自动被清理
+	*/
+	pid_t npid = fork();
+	if (npid == 0)
+	{
+		close(STDOUT_FILENO);
+		close(STDIN_FILENO);
+		close(STDERR_FILENO);
+
+		size_t paramCount = paramList.size();
+		char** ppArgv = (char**)calloc(sizeof(char*) * paramCount + 2);
+		ppArgv[0] = _strdup(cmd.c_str());
+		ppArgv[paramCount-1] = NULL;
+		UINT nIdx = 1;
+		for (const XSTLStringList::const_iterator iter=paramList.begin();
+			iter!=paramList.end(); ++iter)
+		{
+			ppArgv[nIdx++] = _strdup(iter->c_str());
+		}
+		execvp(ppArgv[0], ppArgv);
+	}
+#endif
+}
+
+int CXProcess::Execute(const XSTLString& cmd, XSTLString* pReturn)
+{
+	FILE* processFp = _tpopen(cmd.c_str(), "r");
+	if (processFp == NULL)
+	{
+		return -1;
+	}
+	if (NULL != pReturn)
+	{
+		TCHAR szBuffer[1024] = {0};
+		do 
+		{
+			ssize_t rLen = fread(szBuffer, 1, sizeof(szBuffer), processFp);
+			if (rLen > 0)
+			{
+				*pReturn += XSTLString(szBuffer, rLen);
+			}
+			if (rLen < sizeof(szBuffer))
+			{
+				break;
+			}
+		} while (TRUE);
+	}
+	return _pclose(processFp);
+}
+
+int CXProcess::Execute(const XSTLString& cmd, const XSTLStringList& paramList, XSTLString* pReturn)
+{
+	XSTLString cmdLine = buildCmdLineString(cmd, paramList);
+	return CXProcess::Execute(cmdLine, pReturn);
+}
+
+static XSTLString buildCmdLineString(const XSTLString& cmd, const XSTLStringList& paramList)
+{
+	//参数中如果包含' ','\"','\''(Linux),需要特殊处理
+	//假设cmd 
+	_ASSERT(!cmd.empty());
+	XSTLString cmdLine;
+#ifdef OS_WIN
+	XSTLString cmdarg = CXFilePath::Dos2Unix(cmd);
+	size_t posSpace = cmdarg.find(_T(' '));
+	
+	cmdLine = cmd;
+	//如果有空格加上 ""
+	if (posSpace!=XSTLString::npos && cmd[0] != _T('\"'))
+	{
+		cmdLine = _T('\"') + cmdarg;
+		cmdLine += _T('\"');
+	}
+
+	for (XSTLStringList::const_iterator iter=paramList.begin();
+		iter != paramList.end(); ++iter)
+	{
+		//seperate arguments with space
+		cmdLine += _T(' ');
+
+		size_t pos = iter->find(_T(' '));
+		if (pos != XSTLString::npos)
+		{
+			cmdLine += _T('\"');
+			cmdLine += *iter;
+			cmdLine += _T('\"');
+		}
+		else
+		{
+			cmdLine += *iter;
+		}
+	}
+#else
+	cmdLine = cmd;
+
+	for (XSTLStringList::const_iterator iter=paramList.begin();
+		iter != paramList.end(); ++iter)
+	{
+		//seperate arguments with space
+		cmdLine += _T(' ');
+
+		size_t pos = iter->find(_T(' '));
+		if (pos != XSTLString::npos)
+		{
+			cmdLine += _T('\'');
+			cmdLine += *iter;
+			cmdLine += _T('\'');
+		}
+		else
+		{
+			cmdLine += *iter;
+		}
+	}
+#endif
+	return cmdLine;
 }
 
 void CXProcess::Init()
@@ -449,24 +645,9 @@ BOOL CXProcess::IsProcessExit(XProcessHandle pHandle)
 #endif
 }
 
-#if 0
-BOOL CXProcess::IsExit()
+XSTLString CXProcess::GetWorkingDir()
 {
-	return CXProcess::IsProcessExit(m_pHandle);
+	TCHAR szWorkDir[_MAX_PATH] = { 0 };
+	_tgetcwd(szWorkDir, sizeof(szWorkDir));
+	return szWorkDir;
 }
-
-BOOL CXProcess::Close()
-{
-	BOOL bRet = FALSE;
-#ifdef OS_WIN
-	bRet = ::CloseHandle(m_pHandle);
-	m_pHandle = INVALID_HANDLE_VALUE;
-#else
-	close(m_pid);
-	m_pid = 0;
-	m_pHandle = 0;
-	bRet = TRUE;
-#endif
-	return bRet;
-}
-#endif

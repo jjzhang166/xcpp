@@ -50,6 +50,7 @@ NOTE:
 #elif defined(__linux__) || defined(__linux)
  #ifndef OS_LINUX
   #define OS_LINUX 1
+  #define OS_UNIX OS_LINUX
  #endif
 #if __GNUC__<4
 #error "For some reason, we need gcc version>=gcc4.0"
@@ -67,6 +68,7 @@ NOTE:
 #include <WinBase.h>
 #include <Ws2tcpip.h>
 #include <crtdbg.h>
+#include <direct.h>
 #include <stdint.h>
 #include <io.h>
 typedef void* caddr_t;
