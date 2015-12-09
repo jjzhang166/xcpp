@@ -8,7 +8,7 @@
                           #    #  ####  #      #      
 --------------------------------------------------------------------------------
 description			:  A simple cross platform utilitis tools
-related files		:  stdafx.h XUtils.cpp
+related files		:  XAfx.h XUtils.cpp
 create date			:  2014-09-10
 author				:  CHENQ
 version				:	---
@@ -83,14 +83,39 @@ private:
 	static CGarbo m_gGarbo;  //定义一个静态成员变量，程序结束时，系统会自动调用它的析构函数
 };
 
-#ifndef OS_WIN
-struct GUID 
+#if 0
+//Linux localhost 2.6.32-220.el6.x86_64 #1 SMP     Tue Dec 6   19:48:22 GMT 2011 x86_64 x86_64 x86_64 GNU/Linux
+//Linux ubuntu 3.13.0-32-generic		#57-Ubuntu Tue jul 15  03:51:08 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+struct utsname 
 {
+	char sysname[];    /* Operating system name (e.g., "Linux") */
+	char nodename[];   /* Name within "some implementation-defined
+					   network" */
+	char release[];    /* OS release (e.g., "2.6.28") */
+	char version[];    /* OS version */
+	char machine[];    /* Hardware identifier */
+#ifdef _GNU_SOURCE
+	char domainname[]; /* NIS or YP domain name */
+#endif
+};
+
+struct XSYSTEM_INFO
+{
+	std::string sysName;
+	std::string nodeName;
+	std::string relese;
+	std::string version;
+	std::string machine;
+};
+#endif
+
+#ifndef OS_WIN
+typedef struct _GUID {
 	unsigned long  Data1;
 	unsigned short Data2;
 	unsigned short Data3;
 	unsigned char  Data4[ 8 ];
-};
+} GUID;
 #endif
 
 class CXUtils

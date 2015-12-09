@@ -56,23 +56,25 @@ history :
 #define X_EXTERN_C extern
 #endif
 
-#define X_EOS '\0'
+#define X_EOS _T('\0')
 #define X_EOSW L'\0'
 #define X_EOSA '\0'
 										
 #define XUINT_ROUNDUP(_uintnum, _align) ((((_uintnum)+((_align)-1))/(_align))*(_align))
 #define XUINT_ROUNDDOWN(_uintnum, _align) ((((_uintnum)/(_align))*(_align))
 
-#define XUINT_MEM_ROUNDUP(_uintnum, _align) (((_uintnum)+(_align))&(~((_align)-1)))
+#define XUINT_MEM_ROUNDUP(_uintnum, _align) (((_uintnum)+(_align-1))&(~((_align)-1)))
 #define XUINT_MEM_ROUNDDOWN(_uintnum, _align) ((_uintnum)&(~((_align)-1)))
 
 #define XUINT_VALUE_ROUNDUP(_uintnum, _align) ((((_uintnum)+((_align)-1))/(_align))*(_align))
-#define XUINT_VALUE_ROUNDDOWN(_uintnum, _align) ((((_uintnum)/(_align))*(_align))
-
+#define XUINT_VALUE_ROUNDDOWN(_uintnum, _align) (  ( (_uintnum)/(_align) ) *(_align) )
 
 #define XE_CHAR_ANSI		0x01
 #define XE_CHAR_UNICODE		0x02
-#define XE_CHAR_MODE		(XE_CHAR_ANSI|XE_CHAR_UNICODE)
+#define XE_CHAR_ALL			(XE_CHAR_ANSI|XE_CHAR_UNICODE)
+
+#define X_FUN_DECLAREA(__function_name) __functionn__name##A
+#define X_FUN_DECLAREW(__function_name) __functionn__name##W
 
 #define XE_DEFINE_XESTRINGFUNCA(__name) __name##A
 #define XE_DEFINE_XESTRINGFUNCW(__name) __name##W
@@ -85,6 +87,7 @@ history :
 #define XStrCpyNA lstrcpynA
 #define XStrCpyNW lstrcpynW
 
+#define XE_CHAR_MODE		(XE_CHAR_ANSI|XE_CHAR_UNICODE)
 //defines about UNICODE
 #ifdef _UNICODE
 #ifndef UNICODE
@@ -101,25 +104,26 @@ history :
 #endif
 
 //TODO: Unicode
-#define SPRINTF_S sprintf_s
-#define SSCANF_S sscanf_s
-#define _VSPRINTF vsprintf_s
-#define _VFPRINTF vfprintf_s
-#define _VNFPRINTF _vsnprintf_s
-#define _SPRINTF sprintf_s
+#define SPRINTF_S _stprintf_s
+#define SSCANF_S _stscanf_s
+#define _VSPRINTF _vstprintf_s
+#define _VFPRINTF _vftprintf_s
+#define _VNFPRINTF _vsntprintf_s
+
+#define _SPRINTFEX(_buf, _size,...) _sntprintf_s(_buf, _size-1, _TRUNCATE, __VA_ARGS__)
+#define _SPRINTF _stprintf_s
 #define X_SPRINTFA sprintf_s
+#define X_SPRINTFW swprintf_s
 
 /*
 #warnning X_SPRINTFW 第二个参数应该减去sizeof(wchar_t)
 */
-#define X_SPRINTFW swprintf_s
 
 #define _MKDIR _tmkdir
-
 #define CHECK_ARGUMENT_KEY(argvalue, key) (lstrcmpi((argvalue), _T(key))==0)
 
 #else //OS_WIN end non-win enable
-
+#define XE_CHAR_MODE		XE_CHAR_ANSI
 #include "XEString.h"
 
 #define SPRINTF_S snprintf
@@ -128,6 +132,7 @@ history :
 #define _VFPRINTF vfprintf
 #define _VNFPRINTF vsnprintf
 #define _SPRINTF snprintf
+#define _SPRINTFEX snprintf
 #define _MKDIR(_szpath) mkdir((_szpath), 0777)
 #define _access access
 #define _fileno fileno
@@ -135,6 +140,12 @@ history :
 #define _read read
 #define _write write
 #define _fdopen fdopen
+#define _tcsdup strdup
+#define _tcslen strlen
+#define _tcscmp strcmp
+#define _tprintf printf
+#define _getcwd getcwd
+#define _fopen fopen
 
 #define _TCHAR char
 #define _tmain main
@@ -149,18 +160,11 @@ history :
 #define XStrCpyN XStrCpyNA
 #endif
 
-
 #endif //end of OS_WIN
-
 
 #ifndef LOCAL
 #define LOCAL static
 #endif
-
-/*
-
-
-*/
 
 /**/
 #ifdef __INC_XLOG
@@ -169,8 +173,7 @@ history :
 
 #ifdef __cplusplus
 
-/*学习Qt*/
-
+/*define macro like Qt*/
 #define XCLASS_FORWARD_DECLARE(__class,__Ext) class __class##__Ext;
 #define XCLASSPRIVATE_FORWARD_DECLARE(__class) XCLASS_FORWARD_DECLARE(__class,Private)
 
@@ -180,13 +183,15 @@ history :
 #define XRIVATEOBJ_DECLARE(_class) 
 
 #define XOBJPTR_CREAT(__type,__val) __type* __val = new (std::nothrow) __type()
-#define XCLASSPRIVATE_CREATE(__class,__val) XOBJPTR_CREAT(__class##Private,__val)
+#define XOBJMEMBERPTR_CREAT(__type,__val) __val = new (std::nothrow) __type()
+#define XCLASSPRIVATE_CREATE(__class,__val) XOBJMEMBERPTR_CREAT(__class##Private,__val)
+#define XCLASSPRIVATEVAL_CREATE(__class) XOBJMEMBERPTR_CREAT(__class##Private,m_pD)
 
 #define XOBJPTR_CREAT_WITHPTR(__type,__val,__ptr) __type* __val = new (std::nothrow) __type(__ptr);
 #define XCLASSPRIVATE_CREATE_INIT(__class, __val) XOBJPTR_CREAT_WITHPTR(__class##Private, __val, this)
 
 #define XOBJPTR_DELETE(__val) delete __val
-#define XCLASSPRIVATE_DELETE(__val) XOBJPTR_DELETE(__val)
+#define XCLASSPRIVATEVAL_DELETE() XOBJPTR_DELETE(m_pD)
 
 #endif /*end of __cplusplus*/
 

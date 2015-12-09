@@ -2,10 +2,18 @@
 #define __XFILE_H__
 
 #include "XSTLMacro.h"
+#include "XEString.h"
 
-class CXFilePath
+#ifdef OS_WIN
+#define DEFAULT_XFILEOPEN_MODE _SH_DENYNO
+#else
+#define DEFAULT_XFILEOPEN_MODE 0
+#endif
+
+class CXFilePathW
 {
 public:
+#if (XE_CHAR_MODE & XE_CHAR_UNICODE)
 	static TCHAR* Unix2Dos(TCHAR* pszPath);
 	static TCHAR* Dos2Unix(TCHAR* pszPath);
 	static TCHAR* GetFileDir(TCHAR* pszPath);
@@ -13,14 +21,38 @@ public:
 	static XSTLString Dos2Unix(const XSTLString& dosPath);
 	static BOOL IsDirExist(const TCHAR* pszDir);
 	static BOOL IsPathDir(const TCHAR* pszPath);
+	static BOOL IsPathRelative(const TCHAR* pszPath);
 	static BOOL IsPathFile(const TCHAR* pszPath);
+	static BOOL RemoveFile(const TCHAR* pszPath);
+	static BOOL CopyFile(const TCHAR* pszSrcFile, const TCHAR* pszDstDir);
+	static BOOL FullPath(const TCHAR* pszRelPath, TCHAR* pszAbsPath, size_t bufLen);
 	/* @brief 测试一个文件活着目录是否存在
 	@param pszPathFile[in] 要测试的文件名
 	@return 存在返回TRUE,否则返回FALSE
 	*/
-
 	static BOOL IsFilePathExist(const TCHAR* pszPathFile);
-	static TCHAR* NormalizeFileName(TCHAR* pszFileName);
+	static TCHAR* XE_DEFINE_XESTRINGFUNCW(NormalizeFileName)(TCHAR* pszFileName);
+#endif
+#if (XE_CHAR_MODE & XE_CHAR_ANSI)
+	static char* XE_DEFINE_XESTRINGFUNCA(Unix2Dos)(char* pszPath);
+	static char* XE_DEFINE_XESTRINGFUNCA(Dos2Unix)(char* pszPath);
+	static char* XE_DEFINE_XESTRINGFUNCA(GetFileDir)(char* pszPath);
+	static XSTLStringA XE_DEFINE_XESTRINGFUNCA(Unix2Dos)(const XSTLString& unixPath);
+	static XSTLStringA XE_DEFINE_XESTRINGFUNCA(Dos2Unix)(const XSTLString& dosPath);
+	static BOOL XE_DEFINE_XESTRINGFUNCA(IsDirExist)(const char* pszDir);
+	static BOOL XE_DEFINE_XESTRINGFUNCA(IsPathDir)(const char* pszPath);
+	static BOOL XE_DEFINE_XESTRINGFUNCA(IsPathRelative)(const char* pszPath);
+	static BOOL XE_DEFINE_XESTRINGFUNCA(IsPathFile)(const char* pszPath);
+	static BOOL XE_DEFINE_XESTRINGFUNCA(RemoveFile)(const char* pszPath);
+	static BOOL XE_DEFINE_XESTRINGFUNCA(CopyFile)(const char* pszSrcFile, const char* pszDstDir);
+	static BOOL XE_DEFINE_XESTRINGFUNCA(FullPath)(const char* pszRelPath, char* pszAbsPath, size_t bufLen);
+	/* @brief 测试一个文件活着目录是否存在
+	@param pszPathFile[in] 要测试的文件名
+	@return 存在返回TRUE,否则返回FALSE
+	*/
+	static BOOL XE_DEFINE_XESTRINGFUNCA(IsFilePathExist)(const char* pszPathFile);
+	static char* XE_DEFINE_XESTRINGFUNCA(NormalizeFileName)(char* pszFileName);
+#endif
 };
 
 class CXFile
@@ -33,11 +65,15 @@ public:
 
 	//TODO: GetLine();
 	BOOL OpenWithCreateDir(const TCHAR* pszFileName, const TCHAR* pszFlags);
-	BOOL Open(const TCHAR* pszFileName, const TCHAR* pszFlags, int mode=0);
+	BOOL Open(const TCHAR* pszFileName, const TCHAR* pszFlags, int mode=DEFAULT_XFILEOPEN_MODE);
 
 	//Just For Read
 	size_t GetSize() const;
 	size_t GetOffset() const;
+
+	//Seek
+	BOOL Seek(ssize_t offset, int whence);
+	void Rewind();
 
 	ssize_t OutString(const char* pFmt, ...);
 	void Flush();

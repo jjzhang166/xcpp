@@ -15,10 +15,10 @@ If you find any bugs, please e-mail me chennqqi@qq.com
 --------------------------------------------------------------------------------
 NOTE:
  You should include this file before you use any code of XCPP project.
- Generally, this file is included in "stdafx.h"
+ Generally, this file is included in "XAfx.h"
  
  在使用任何xcpp项目中的代码，你首先要包含这个文件。
- 通常来说你只要在你的预处理文件stdafx.h中包含就ok了
+ 通常来说你只要在你的预处理文件XAfx.h中包含就ok了
 
 *******************************************************************************/
 #ifndef __XCPP_AFX_H__
@@ -70,6 +70,7 @@ NOTE:
 #include <crtdbg.h>
 #include <direct.h>
 #include <stdint.h>
+#include <sys/stat.h>
 #include <io.h>
 typedef void* caddr_t;
 
@@ -84,6 +85,9 @@ typedef __int64 ssize_t;
 typedef int ssize_t;
 #endif
 
+#define S_ISREG(m) (((m) & _S_IFMT) == (_S_IFREG))  
+#define S_ISDIR(m) (((m) & _S_IFMT) == (_S_IFDIR)) 
+
 #else //!!!OS_WIN
 #include <sys/socket.h>
 #include <assert.h>
@@ -92,6 +96,7 @@ typedef int ssize_t;
 #include <limits.h>
 #include <unistd.h>
 #include <wchar.h>
+#include <sys/stat.h>
 
 #ifdef NDEBUG
 #define _ASSERT(x)
@@ -123,9 +128,9 @@ typedef int ssize_t;
 #define _alloca alloca
 
 #include <inttypes.h>
-#define INVALID_HANDLE_VALUE ((int)(~0))
 
 #if !defined(_INC_WINDOWS) && !defined(_WINDOWS_)
+#define INVALID_HANDLE_VALUE ((int)(~0))
 typedef int            BOOL;     /* f */
 typedef unsigned char  BYTE;     /* b */
 typedef unsigned int   UINT;     /* ui */
@@ -135,6 +140,7 @@ typedef uint64_t	   UINT64;
 typedef unsigned long long ULONG64;
 typedef int64_t		   INT64;
 typedef uint32_t	  UINT32;
+typedef uint32_t	  DWORD;
 typedef int32_t		INT32;
 typedef uint16_t	UINT16;
 typedef int16_t		INT16;
@@ -145,6 +151,8 @@ typedef int         INT;
 
 #define _stricmp strcasecmp
 #define _strnicmp strncasecmp
+
+#define _stat stat
 
 #ifndef _MAX_PATH
 #define _MAX_PATH PATH_MAX
@@ -169,6 +177,9 @@ typedef char		TCHAR;
 #ifndef FALSE
 #define FALSE   0
 #endif
+
+#define _pclose pclose
+#define _popen popen
 
 #endif /*OS_LINUX*/
 
@@ -200,10 +211,15 @@ typedef int errno_t;
 #define UNUSED(x) (void)(x)
 #endif
 
-
 #ifndef X_UNINIT
 #define X_UNINIT(x) (void)(x)
 #endif
+
+#if defined(UNICODE)||defined(_UNICODE)
+#ifndef OS_WIN
+#error "UNICODE option is only supported under windows os"
+#endif
+#endif	/*end of unicode @218 */
 
 #include "XEndian.h"
 
@@ -223,9 +239,12 @@ typedef int errno_t;
 	void operator=(const TypeName&)
 #endif
 
-
-/*是否编译正在开发中的宏*/
-#define XCPP_DEVELOP_CODE
+#define XCPP_CODE_STATBLE	0		/*This code is stable, you can using it free*/
+#define XCPP_CODE_DEPRECATED	1	/*This code is depreacted, it will be removed in next versions*/
+#define XCPP_CODE_DEVELOP	2		/*This code now is on developing. You should not use. The
+										code may have bugs or will be removed*/
+#define XCPP_CODE_FUTRURE	3		/*This code has not finished yet. You must not use it*/
+#define XCPP_CODE_LEVEL XCPP_CODE_STATBLE
 
 #include "XMacro.h"
 #include "XVersion.h"

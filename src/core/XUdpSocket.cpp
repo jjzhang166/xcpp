@@ -14,7 +14,7 @@ history :
 2014/09/17			CHENQ	enable create as client or server,support Linux&windows
 *******************************************************************************/
 
-#include "stdafx.h"
+#include "XAfx.h"
 #include "XSocket.h"
 #include "XUdpSocket.h"
 

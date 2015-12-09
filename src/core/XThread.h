@@ -112,6 +112,7 @@ private:
 
 /** @brief默认线程栈空间大小，如果不调用SetStackSize进行设置 */
 #define XTHREAD_STACK_SIZE (1024*1024U)
+
 class CXThreadEx
 {
 public:

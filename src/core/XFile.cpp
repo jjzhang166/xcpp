@@ -1,13 +1,15 @@
-#include "stdafx.h"
+#include "XAfx.h"
 #include "XFile.h"
 #ifdef OS_WIN
 #include <direct.h>
 #include <sys/stat.h>
+#include <Shlwapi.h>
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>
 #include "XEString.h"
@@ -182,6 +184,101 @@ BOOL CXFilePath::IsPathFile(const TCHAR* pszPath)
 	return FALSE;
 }
 
+BOOL CXFilePath::RemoveFile(const TCHAR* pszPath)
+{
+#ifdef OS_WIN
+	return ::DeleteFile(pszPath);
+#else
+	return 0==remove(pszPath);
+#endif
+}
+
+BOOL CXFilePath::FullPath(const TCHAR* pszRelPath, TCHAR* pszAbsPath, size_t bufLen)
+{
+#ifdef OS_WIN
+	return NULL!=_fullpath(pszAbsPath, pszRelPath, bufLen);
+#else
+	return NULL!=realpath(pszRelPath, pszAbsPath);
+#endif
+	return FALSE;
+}
+
+BOOL CXFilePath::IsPathRelative(const TCHAR* pszDir)
+{
+#ifdef OS_WIN
+	return ::PathIsRelative(pszDir);
+#else
+	return pszDir[0] != '/';
+#endif
+}
+
+BOOL CXFilePath::CopyFile(const TCHAR* pszSrcFile, const TCHAR* pszDstDir)
+{
+#ifdef OS_WIN
+	return ::CopyFile(pszSrcFile, pszDstDir, TRUE);
+#else
+	const char* to = pszDstDir;
+	const char* from = pszSrcFile;
+
+	int fd_to = 0, fd_from = 0;
+	char buf[4096] = {0};
+	ssize_t nread = 0;
+	int saved_errno = 0;
+
+	fd_from = open(from, O_RDONLY);
+	if (fd_from < 0)
+	{	return FALSE;}
+
+	fd_to = open(to, O_WRONLY | O_CREAT | O_EXCL, 0666);
+	if (fd_to < 0)
+	{	goto out_error; }
+
+	while (nread = read(fd_from, buf, sizeof buf), nread > 0)
+	{
+		char *out_ptr = buf;
+		ssize_t nwritten;
+
+		do 
+		{
+			nwritten = write(fd_to, out_ptr, nread);
+
+			if (nwritten >= 0)
+			{
+				nread -= nwritten;
+				out_ptr += nwritten;
+			}
+			else if (errno != EINTR)
+			{
+				goto out_error;
+			}
+		} while (nread > 0);
+	}
+
+	if (nread == 0)
+	{
+		if (close(fd_to) < 0)
+		{
+			fd_to = -1;
+			goto out_error;
+		}
+		close(fd_from);
+
+		/* Success! */
+		return TRUE;
+	}
+
+out_error:
+	saved_errno = errno;
+
+	close(fd_from);
+	if (fd_to >= 0)
+		close(fd_to);
+
+	errno = saved_errno;
+	return FALSE;
+#endif
+}
+
 TCHAR* CXFilePath::GetFileDir(TCHAR* pszPath)
 {
 	_ASSERT(pszPath);
@@ -213,7 +310,9 @@ TCHAR* CXFilePath::GetFileDir(TCHAR* pszPath)
 		if (pszPath[len - 1] == _T('\\') || pszPath[len - 1] == _T('/'))
 		{
 			pszPath[len] = EOS;
+			break;
 		}
+		len--;
 	}
 	return pszPath;
 }
@@ -270,6 +369,18 @@ size_t CXFile::GetOffset() const
 {
 	_ASSERT(m_fp);
 	return ftell(m_fp);
+}
+
+BOOL CXFile::Seek(ssize_t offset, int whence)
+{
+	_ASSERT(m_fp);
+	return 0==fseek(m_fp, offset, whence);
+}
+
+void CXFile::Rewind()
+{
+	_ASSERT(m_fp);
+	return rewind(m_fp);
 }
 
 BOOL CXFile::Open(const TCHAR* pszFileName, const TCHAR* pszFlags, int mode)

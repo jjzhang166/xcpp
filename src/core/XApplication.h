@@ -14,36 +14,34 @@ version				:	---
 If you find any bugs, please e-mail me chennqqi@qq.com
 --------------------------------------------------------------------------------
 
+History:
+2015/12/6 chenq change CSingletonAppPrivate To CSingletonApplicationPrivate
+
 TODO:
-1. will be abolished in next version
-2. singleton process
 *******************************************************************************/
 
 
 #ifndef __APPLICATION_H__
 #define __APPLICATION_H__
 
-#include "XUdpSocket.h"
-
-
+#include "XSTLMacro.h"
 /**
 	@brief µ¥Àý½ø³Ì
 	@detail 
 */
-#include <string>
 
-class CSingletonAppliaionObj;
-class CSingletonAppliaion
+XCLASSPRIVATE_FORWARD_DECLARE(CSingletonApp);
+class CSingletonApp
 {
 public:
-	CSingletonAppliaion(const char* pszAppKey=NULL);
-	virtual ~CSingletonAppliaion();
+	CSingletonApp(const TCHAR* pszAppKey=NULL);
+	virtual ~CSingletonApp();
 
 	BOOL Verify() const;
 
 private:
-	std::string m_strKey;
-	CSingletonAppliaionObj* m_Obj;
+	XCLASSPRIVATE_DECLARE(CSingletonApp);
+	DISALLOW_COPY_AND_ASSIGN(CSingletonApp);
 };
 
 #endif /*__APPLICATION_H__*/

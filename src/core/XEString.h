@@ -219,6 +219,9 @@ extern "C" {
 
 #endif /*ENDIF XE_CHAR_MODE&XE_CHAR_UNICODE */
 
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef UNICODE
 #define XStrUpr XStrUprW
@@ -235,11 +238,5 @@ extern "C" {
 #define XStrSplitMd XStrSplitMdA
 #define XStrSplitMdEx XStrSplitMdExA
 #endif
-
-
-#ifdef __cplusplus
-}
-#endif
-
 
 #endif /*__XESTRING_H__*/

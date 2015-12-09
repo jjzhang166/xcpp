@@ -211,4 +211,56 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(CXSemCount);
 };
 
+XCLASSPRIVATE_FORWARD_DECLARE(CXSemReadWrite);
+class CXSemReadWrite
+{
+public:
+	explicit CXSemReadWrite();
+	~CXSemReadWrite();
+
+	BOOL WaitForTakeRead(UINT timeOutMs);
+	BOOL WaitForTakeWrite(UINT timeOutMs);
+	void TakeRead();
+	void TakeWrite();
+	void Give();
+
+private:
+	XCLASSPRIVATE_DECLARE(CXSemReadWrite);
+	DISALLOW_COPY_AND_ASSIGN(CXSemReadWrite);
+};
+
+class CXSemReadLocker
+{
+public:
+	CXSemReadLocker(CXSemReadWrite* pRwLock) : m_p(pRwLock)
+	{
+		_ASSERT(pRwLock);
+		pRwLock->TakeRead();
+	}
+	~CXSemReadLocker()
+	{
+		m_p->Give();
+		m_p = NULL;
+	}
+private:
+	CXSemReadWrite* m_p;
+};
+
+class CXSemWriteLocker
+{
+public:
+	CXSemWriteLocker(CXSemReadWrite* pRwLock) : m_p(pRwLock)
+	{
+		_ASSERT(pRwLock);
+		pRwLock->TakeWrite();
+	}
+	~CXSemWriteLocker()
+	{
+		m_p->Give();
+		m_p = NULL;
+	}
+private:
+	CXSemReadWrite* m_p;
+};
+
 #endif /*__XLOCK_H__*/

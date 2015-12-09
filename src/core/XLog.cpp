@@ -1,7 +1,7 @@
 /*! XLog.cpp
 ********************************************************************************
 description			:  A simple cross platform log file implement
-related files		:  stdafx.h XUtils.h 
+related files		:  XAfx.h XUtils.h 
 create date			:  2014-09-10
 author				:  CHENQ
 version				:	---
@@ -13,8 +13,9 @@ history :
 2014/09/10			CHENQ	created
 *******************************************************************************/
 
-#include "stdafx.h"
+#include "XAfx.h"
 #include "XLog.h"
+#include "XLogDefines.h"
 #include "XUtils.h"
 
 #include <time.h>

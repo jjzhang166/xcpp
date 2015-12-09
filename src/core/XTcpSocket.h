@@ -28,7 +28,7 @@ history :
 #include "XSocket.h"
 
 /** TCP Socket*/
-class CXTcpSocket : 	public CXSocket
+class CXTcpSocket : public CXSocket
 {
 public:
 	CXTcpSocket() {}
@@ -136,8 +136,7 @@ public:
 	ssize_t WaitForRecv(unsigned int timeOutMs) const;
 };
 
-#ifdef XCPP_DEVELOP_CODE
-#if X_VERSION_VALUE >= X_VERSION_MAKE(0,5,0)
+#if XCPP_CODE_LEVEL>=XCPP_CODE_FUTRURE
 /*π‹¿ÌSOCKET ◊È*/
 class CXTcpSessionGroup
 {
@@ -147,7 +146,6 @@ public://TODO::
 
 	BOOL PrePare(fd_set& set);
 };
-#endif
 #endif
 
 #endif /*__XTCPSOCKET_H__*/

@@ -15,7 +15,7 @@ history :
 							CXTcpSessionSocket::WaitAndSend separate buffer to 2048 to avoid send failed
 *******************************************************************************/
 
-#include "stdafx.h"
+#include "XAfx.h"
 #include "XSocket.h"
 #include "XTcpSocket.h"
 #include "XLog.h"

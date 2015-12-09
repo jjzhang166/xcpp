@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "XAfx.h"
 #include "XSocket.h"
 #include "XUtils.h"
 
@@ -13,9 +13,10 @@ public:
 	CSocketXInitOnce()
 	{
 		WSADATA info;
-		if (WSAStartup(MAKEWORD(2, 0), &info))
+		DWORD erroCode = WSAStartup(MAKEWORD(2, 2), &info);
+		if (erroCode != 0)
 		{
-			throw "Could not start WSA";
+			_ASSERT(FALSE);
 		}
 	}
 	~CSocketXInitOnce()

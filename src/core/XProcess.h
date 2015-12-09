@@ -8,7 +8,7 @@
                           #    #  ####  #      #      
 --------------------------------------------------------------------------------
 description			:  A simple cross platform process interface
-related files		:  stdafx.h XUtils.h XProcess.cpp
+related files		:  XAfx.h XUtils.h XProcess.cpp
 create date			:  2014-09-10
 author				:  CHENQ
 version				:	---
@@ -87,15 +87,17 @@ public:
 
 	static XProcessHandle GetCurrentProcessHandle();
 	static XProcessId GetCurrentProcessId();
-	static XSTLString GetCurrentExcuteName();
+
+	static XSTLStringW GetCurrentExcuteNameW();
 	static XSTLStringA GetCurrentExcuteNameA();
 
-	static XSTLString GetCurrentExcutePath();
+	static XSTLString GetCurrentExcutePathA();
+	static XSTLString GetCurrentExcutePathW();
 	
 #ifdef OS_WIN
 	XProcessId GetProcessIdByHandle(HANDLE Process);
 #endif
-	
+
 private:
 	XProcessHandle m_pHandle;
 	XProcessId m_pid;

@@ -8,7 +8,7 @@
                           #    #  ####  #      #      
 --------------------------------------------------------------------------------
 description			:  A simple cross platform setting file
-related files		:  stdafx.h XSettings.cpp
+related files		:  XAfx.h XSettings.cpp
 create date			:  2014-10-11
 author				:  CHENQ
 version				:  0.0.1
@@ -104,6 +104,8 @@ public:
 	INT64 GetInt64(const char* pKey, INT64 i64Default=0) const;
 	BOOL GetBoolean(const char* pKey, BOOL bDefault=FALSE) const;
 	UINT GetUint(const char* pKey, UINT nDefault=0) const;
+	double GetDouble(const char* pKey, double dDefault=.0) const;
+	float GetFloat(const char* pKey, float dDefault=.0) const;
 	std::string GetString(const char* pKey, const char* pszDefault) const;
 
 	/** @brief 设置函数
@@ -118,6 +120,8 @@ public:
 	BOOL SetUint(const char* pKey, UINT nValue);
 	BOOL SetInt64(const char* pKey, INT64 i64Value);
 	BOOL SetString(const char* pKey, const char* pValue);
+	BOOL SetDouble(const char* pKey, double dValue);
+	BOOL SetFloat(const char* pKey, float fValue);
 
 	/** @brief 设置函数
 		@param [in] pKey, 变量名，字符串，要求唯一 \n

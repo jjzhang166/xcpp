@@ -8,7 +8,7 @@
                           #    #  ####  #      #      
 --------------------------------------------------------------------------------
 description			:  A simple cross platform log file 
-related files		:  stdafx.h XLog.cpp
+related files		:  XAfx.h XLog.cpp
 create date			:  2014-09-10
 author				:  CHENQ
 version				:  0.0.1

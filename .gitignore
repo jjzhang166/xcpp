@@ -1,3 +1,14 @@
 /build/vs2013-x86/libxcpp/*.suo
 /build/vs2010-x86/temp/libxcpp/Debug/libxcpp.vcxprojResolveAssemblyReference.cache
 /build/vs2010-x86/lib/Debug
+*.unsuccessfulbuild
+*.obj
+*.tlog
+*.lastbuildstate
+*.log
+*.opensdf
+*.ipch
+*.pdb
+*.sdf
+*.user
+*.suo

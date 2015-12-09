@@ -1,7 +1,7 @@
 /*! XProcess.cpp
 ********************************************************************************
 description			:  A simple cross platform process interface
-related files		:  stdafx.h XUtils.h XProcess.h
+related files		:  XAfx.h XUtils.h XProcess.h
 create date			:  2014-09-10
 author				:  CHENQ
 version				:	---
@@ -23,7 +23,7 @@ note:
 *******************************************************************************/
 
 
-#include "stdafx.h"
+#include "XAfx.h"
 
 #include <string>
 #include <iostream>
@@ -604,7 +604,7 @@ XSTLString CXProcess::GetCurrentExcutePath()
 #endif
 }
 
-XSTLString CXProcess::GetCurrentExcuteName()
+XSTLString CXProcess::GetCurrentExcuteNameW()
 {
 	XSTLString name = CXProcess::GetCurrentExcutePath();
 	if (name.size() != 0)

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "XAfx.h"
 
 #include "XSharedMemory.h"
 #include "XSemaphore.h"

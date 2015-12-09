@@ -1,4 +1,4 @@
-//#include "stdafx.h"
+//#include "XAfx.h"
 #include "XAfx.h"
 
 #if (XE_CHAR_MODE & XE_CHAR_ANSI)

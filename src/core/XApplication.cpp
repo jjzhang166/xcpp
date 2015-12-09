@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "XAfx.h"
 #include "XApplication.h"
 
 #include "XUdpSocket.h"
@@ -21,15 +21,26 @@
 #define SIGNLETON_PROCESS_USE_SHAREDMEMORY	3
 #define SIGNLETON_PROCESS_IMPLEMENT SINGLETON_PROCESS_USE_LOCKFILE
 
-class CSingletonAppliaionObj
+class CSingletonAppPrivate
 {
 public:
-	CSingletonAppliaionObj(const std::string& appName);
-	~CSingletonAppliaionObj();
+	CSingletonAppPrivate() : m_handle(0), m_bOk(FALSE)
+	{	}
+	~CSingletonAppPrivate()
+	{
+		Release();
+	}
 
-	BOOL Veriyfy() const { return m_bOk; }
+	BOOL CreateByKey(const TCHAR* pszKey);
+
+	void Release();
+
+	BOOL Verify() const { return m_bOk; }
+
+	XSTLString GetKey() const { return m_szKey;}
 
 private:
+	XSTLString m_szKey;
 #ifdef OS_WIN
 	HANDLE m_handle;
 #else
@@ -40,20 +51,20 @@ private:
 
 #ifdef OS_WIN
 #define LOCKFILE_PATH "Global\\"
-CSingletonAppliaionObj::CSingletonAppliaionObj(const std::string& appName) :
-	m_handle(NULL), m_bOk(FALSE)
+BOOL CSingletonAppPrivate::CreateByKey(const TCHAR* pszKey)
 {
-	std::string instanceName = std::string(LOCKFILE_PATH) + appName;
-	m_handle = CreateMutexA(NULL, FALSE, instanceName.c_str());
+	XSTLString instanceName = XSTLString(LOCKFILE_PATH) + XSTLString(pszKey);
+	m_handle = CreateMutex(NULL, FALSE, instanceName.c_str());
 	m_bOk = !(GetLastError() == ERROR_ALREADY_EXISTS);
+	return m_handle!=NULL;
 }
 
-CSingletonAppliaionObj::~CSingletonAppliaionObj()
+void CSingletonAppPrivate::Release()
 {
-	if (m_handle != NULL)
+	if (m_handle)
 	{
-		m_handle = NULL;
 		::CloseHandle(m_handle);
+		m_handle = NULL;
 	}
 }
 #else
@@ -72,65 +83,58 @@ static BOOL sTrylockfile(int fd)
 	return (fcntl(fd, F_SETLK, &fl))==0;
 }
 
-CSingletonAppliaionObj::CSingletonAppliaionObj(const std::string& appName) :
-	m_handle(0), m_bOk(FALSE)
+BOOL CSingletonAppPrivate::CreateByKey(const TCHAR* pszKey)
 {
-	std::string instanceName = LOCKFILE_PATH + appName + ".pid";
+	XSTLString instanceName = LOCKFILE_PATH + pszKey + ".pid";
 	m_handle = open(instanceName.c_str(), O_RDWR | O_CREAT, LOCKMODE);
 	if (m_handle < 0)
 	{
-		//m_bOk = FALSE;
+		_ASSERT(FALSE);
 		XLOG_PRINT(LOG_ERR, "<%s>Can't Open File %s, errno is %d", __FUNCTION__, instanceName.c_str(), errno);
-		return;
+		return FALSE;
 	}
 
 	if (!sTrylockfile(m_handle) && (errno == EACCES || errno == EAGAIN))
 	{
 		//m_bOk = FALSE; 
 		XLOG_PRINT(LOG_ERR, "<%s>file: %s already locked", __FUNCTION__, instanceName.c_str());
-		return ;
+		return TRUE;
 	}
-	char szBuffer[32] = {0};
+	TCHAR szBuffer[32] = {0};
 	int retVal = ftruncate(m_handle, 0);
 	UNUSED(retVal);
 
 	//¼æÈÝ64Î»ÏµÍ³
-	_SPRINTF(szBuffer, sizeof(szBuffer)-1, "%lld", (long long int)getpid());
+	_SPRINTFEX(szBuffer, sizeof(szBuffer), "%lld", (long long int)getpid());
 	retVal = write(m_handle, szBuffer, strlen(szBuffer) + 1);
 	m_bOk = TRUE;
 }
 
-CSingletonAppliaionObj::~CSingletonAppliaionObj()
+void CSingletonAppPrivate::Release()
 {
-	if (m_handle > 0)
+	if (m_handle)
 	{
 		close(m_handle);
-		m_handle = 0;
+		m_handle = NULL;
 	}
 }
 #endif
 
-CSingletonAppliaion::CSingletonAppliaion(const char* pszAppKey)
-	: m_strKey(pszAppKey)
+CSingletonApp::CSingletonApp(const TCHAR* pszAppKey)
 {
-	if (NULL == pszAppKey)
-	{
-		m_strKey = CXProcess::GetCurrentExcuteNameA();
-	}
-	m_Obj = new (std::nothrow) CSingletonAppliaionObj(m_strKey);
-	_ASSERT(m_Obj != NULL);
+	_ASSERT(pszAppKey);
+	XCLASSPRIVATEVAL_CREATE(CSingletonApp);
+	BOOL bCreateOK = m_pD->CreateByKey(pszAppKey);
+	UNUSED(bCreateOK);
 }
 
-BOOL CSingletonAppliaion::Verify() const
+BOOL CSingletonApp::Verify() const
 {
-	_ASSERT(m_Obj);
-	return m_Obj->Veriyfy();
+	_ASSERT(m_pD);
+	return m_pD->Verify();
 }
 
-CSingletonAppliaion::~CSingletonAppliaion()
+CSingletonApp::~CSingletonApp()
 {
-	if (NULL != m_Obj)
-	{
-		delete m_Obj;
-	}
+	XCLASSPRIVATEVAL_DELETE();
 }

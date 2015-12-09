@@ -89,7 +89,7 @@ type __sync_xor_and_fetch (type *ptr, type value);
 type __sync_nand_and_fetch (type *ptr, type value);
 
 ==============================================================================================================
-||											C++1 支持CAS													||
+||											C++11 支持CAS													||
 ==============================================================================================================
 1）template< class T > bool atomic_compare_exchange_weak( std::atomic<T>* obj,T* expected, T desired );
 2）template< class T > bool atomic_compare_exchange_weak( volatile std::atomic<T>* obj,T* expected, T desired );

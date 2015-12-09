@@ -1,7 +1,7 @@
 /*! XUtils.h
 ********************************************************************************
 description			:  A simple cross platform utilitis tools
-related files		:  stdafx.h XUtils.h
+related files		:  XAfx.h XUtils.h
 create date			:  2014-09-10
 author				:  CHENQ
 version				:	---
@@ -13,7 +13,7 @@ history :
 2014/09/10			CHENQ	created
 *******************************************************************************/
 
-#include "stdafx.h"
+#include "XAfx.h"
 #include "XUtils.h"
 #include <time.h>
 
@@ -216,7 +216,7 @@ size_t CXUtils::split(const std::string& s, const std::string& delim, std::vecto
 		last=index+1;
 		index=s.find_first_of(delim,last);
 	}
-	if (index-last>0)
+	if (index!=std::string::npos && index-last>0)
 	{
 		pRetSubString->push_back(s.substr(last,index-last));
 		nCount++;
@@ -238,7 +238,7 @@ size_t CXUtils::split(const std::string& s, const std::string& delim, std::list<
 		last=index+1;
 		index=s.find_first_of(delim,last);
 	}
-	if (index-last>0)
+	if (index!=std::string::npos && index-last>0)
 	{
 		pRetSubString->push_back(s.substr(last,index-last));
 		nCount++;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "XAfx.h"
 #include <iostream>
 #include <fstream>
 #include <string.h>
@@ -69,47 +69,47 @@ BOOL CXSettings::Load(const char* pszSettingFile, UINT nMaxLine)
 				//section
 			case '[':
 				{
-						char* pszSetionNameEnd = strchr(pSzKey, ']');
-						if (pszSetionNameEnd == NULL)
-						{
-							XSETTING_LOG(LOG_WARNING, "<%s>:Section name need ']'", __FUNCTION__);
-							continue;
-						}
+					char* pszSetionNameEnd = strchr(pSzKey, ']');
+					if (pszSetionNameEnd == NULL)
+					{
+						XSETTING_LOG(LOG_WARNING, "<%s>:Section name need ']'", __FUNCTION__);
+						continue;
+					}
 
-						std::string sectionName(pSzKey+1, pszSetionNameEnd-1-pSzKey);
-						XSETTING_MAP::iterator iter = m_mapVal.find(sectionName);
-						if (iter != m_mapVal.end())
-						{
-							XSETTING_LOG(LOG_WARNING, "<%s>:Section name(%s) repeated, setting may be overide \']\'", __FUNCTION__, sectionName.c_str());
-							m_iterRead = iter;
-							continue;
-						}
-						XSettingSection emptyMap;
-						std::pair<XSETTING_MAP::iterator, bool> newIter = m_mapVal.insert(XSETTING_MAP::value_type(sectionName, emptyMap));
-						m_iterRead = newIter.first;
+					std::string sectionName(pSzKey+1, pszSetionNameEnd-1-pSzKey);
+					XSETTING_MAP::iterator iter = m_mapVal.find(sectionName);
+					if (iter != m_mapVal.end())
+					{
+						XSETTING_LOG(LOG_WARNING, "<%s>:Section name(%s) repeated, setting may be overide \']\'", __FUNCTION__, sectionName.c_str());
+						m_iterRead = iter;
+						continue;
+					}
+					XSettingSection emptyMap;
+					std::pair<XSETTING_MAP::iterator, bool> newIter = m_mapVal.insert(XSETTING_MAP::value_type(sectionName, emptyMap));
+					m_iterRead = newIter.first;
 				}
 				break;
 
 				//key-value
 			default:
 				{
-					   char* pSep = strchr(pSzKey, '=');
-					   if (pSep == NULL)
-					   {
-						   XSETTING_LOG(LOG_WARNING, "<%s>:Section name(%)->(%s) not type of key=value",
-							   __FUNCTION__, m_iterRead->first.c_str(), pSzKey);
-					   }
-					   else
-					   {
-						   char* pszValue = pSep + 1;
-						   *pSep = EOS;
-						   char* pszValidKey = XStrTrimA(pSzKey);
-						   char* pszValidValue = XStrTrimA(pszValue);
+					char* pSep = strchr(pSzKey, '=');
+					if (pSep == NULL)
+					{
+						XSETTING_LOG(LOG_WARNING, "<%s>:Section name(%)->(%s) not type of key=value",
+							__FUNCTION__, m_iterRead->first.c_str(), pSzKey);
+					}
+					else
+					{
+						char* pszValue = pSep + 1;
+						*pSep = EOS;
+						char* pszValidKey = XStrTrimA(pSzKey);
+						char* pszValidValue = XStrTrimA(pszValue);
 
-						   std::string key(pszValidKey);
-						   std::string value(pszValidValue);
-						   m_iterRead->second.insert(XSettingSection::value_type(key, value));
-					   }
+						std::string key(pszValidKey);
+						std::string value(pszValidValue);
+						m_iterRead->second.insert(XSettingSection::value_type(key, value));
+					}
 				}
 				break;
 			}
@@ -139,22 +139,22 @@ int CXSettings::EnumValue(ENUM_SETTING_FUNC pFunc)
 
 	//TODO::
 	int iCount = 0;
-		XSETTING_MAP::iterator mapciter = m_mapVal.begin();
-		for (; mapciter != m_mapVal.end(); ++mapciter)
+	XSETTING_MAP::iterator mapciter = m_mapVal.begin();
+	for (; mapciter != m_mapVal.end(); ++mapciter)
+	{
+		XSettingSection& sectionName = mapciter->second;
+		for (XSettingSection::iterator iter = sectionName.begin();
+			iter != sectionName.end(); iter++)
 		{
-			XSettingSection& sectionName = mapciter->second;
-			for (XSettingSection::iterator iter = sectionName.begin();
-				iter != sectionName.end(); iter++)
+			iCount++;
+			if (!(*pFunc)(mapciter->first, iter->first, iter->second))
 			{
-				iCount++;
-				if (!(*pFunc)(mapciter->first, iter->first, iter->second))
-				{
-					break;
-				}
+				break;
 			}
 		}
+	}
 
-		return iCount;
+	return iCount;
 }
 
 BOOL CXSettings::Save(const char* pszSettingFile)
@@ -261,7 +261,7 @@ const CXSettings::XSettingSection* CXSettings::GetSecionPtrR(const char* pszKey)
 CXSettings::XSettingSection* CXSettings::GetSecionPtrW(const char* pszKey)
 {
 	//C++中，引用不能改变指向，所以这里使用指针
-	XSettingSection* pSection = &(m_iterRead->second);
+	XSettingSection* pSection = &(m_iterWrite->second);
 	const char* pSectionSep = strchr(pszKey, ':');
 
 	if (pSectionSep != NULL)
@@ -367,6 +367,54 @@ UINT CXSettings::GetUint(const char* pKey, UINT nDefault) const
 	return ret;
 }
 
+double CXSettings::GetDouble(const char* pKey, double dDefault) const
+{
+	_ASSERT(pKey);
+	const XSettingSection* pSection = GetSecionPtrR(pKey);
+	if (NULL == pSection)
+	{
+		return dDefault;
+	}
+
+	std::map<std::string, std::string>::const_iterator iter = pSection->find(pKey);
+	if (iter == pSection->end())
+	{
+		return dDefault;
+	}
+
+	const char* pValue = iter->second.c_str();
+	double ret = .0;
+	if (1 != SSCANF_S(pValue, "%lf", &dDefault))
+	{
+		return dDefault;
+	}
+	return ret;
+}
+
+float CXSettings::GetFloat(const char* pKey, float fDefault) const
+{
+	_ASSERT(pKey);
+	const XSettingSection* pSection = GetSecionPtrR(pKey);
+	if (NULL == pSection)
+	{
+		return fDefault;
+	}
+
+	std::map<std::string, std::string>::const_iterator iter = pSection->find(pKey);
+	if (iter == pSection->end())
+	{
+		return fDefault;
+	}
+
+	const char* pValue = iter->second.c_str();
+	float ret = .0;
+	if (1 != SSCANF_S(pValue, "%f", &ret))
+	{
+		return fDefault;
+	}
+	return ret;
+}
+
 std::string CXSettings::GetString(const char* pKey, const char* pszDefault) const
 {
 	_ASSERT(pKey);
@@ -459,6 +507,38 @@ BOOL CXSettings::SetString(const char* pKey, const char* pValue)
 	if (iter == pSection->end())
 	{
 		pSection->insert(std::map<std::string, std::string>::value_type(pKey, pValue));
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL CXSettings::SetDouble(const char* pKey, double dValue)
+{
+	_ASSERT(pKey);
+	XSettingSection* pSection = GetSecionPtrW(pKey);
+
+	std::map<std::string, std::string>::iterator iter = pSection->find(pKey);
+	if (iter == pSection->end())
+	{
+		char szValue[32] = { 0 };
+		_SPRINTFEX(szValue, sizeof(szValue), "%lf", (long long)dValue);
+		pSection->insert(std::map<std::string, std::string>::value_type(pKey, szValue));
+		return TRUE;
+	}
+	return FALSE;
+}
+
+BOOL CXSettings::SetFloat(const char* pKey, float fValue)
+{
+	_ASSERT(pKey);
+	XSettingSection* pSection = GetSecionPtrW(pKey);
+
+	std::map<std::string, std::string>::iterator iter = pSection->find(pKey);
+	if (iter == pSection->end())
+	{
+		char szValue[32] = { 0 };
+		_SPRINTFEX(szValue, sizeof(szValue), "%f", fValue);
+		pSection->insert(std::map<std::string, std::string>::value_type(pKey, szValue));
 		return TRUE;
 	}
 	return FALSE;
@@ -695,7 +775,7 @@ bool CXCfgFile::set_string(const std::string& key, const std::string& value)
 {
 	bool ret = false;
 
-//	if (!m_map.empty())
+	//	if (!m_map.empty())
 	{
 		m_map[key] = value;
 		set_vector_string(key, value);
@@ -774,7 +854,7 @@ void CXCfgFile::trim_left_right(std::string &str)
 
 void CXCfgFile::set_vector_string(const std::string& key, const std::string& value)
 {
-//	if (!m_data.empty() && !key.empty())
+	//	if (!m_data.empty() && !key.empty())
 	{
 		std::vector<std::string>::iterator iter;
 		std::string str;
